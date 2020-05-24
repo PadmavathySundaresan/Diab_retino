@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Diabetic Retinopathy </title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+	<style>
+		.textColor{
+			font-weight: bold;
+			color: white;
+			font-size: 50px;
+			padding-top: 10px;
+			}
+
+		.btn{min-width:300px;}
+
+		.borderGrey{
+			border: solid 5px grey;
+		}
+			
+	</style>
+		
+</head>
+<body>
+
+<!-- Image and text -->
+<nav class="navbar navbar-dark bg-dark navbar-expand-md bg-dark mb-3"> 
+
+  <div class="row">
+
+    <div class="col col-lg-2 col-md-6 col-sm-12">
+      <a class="navbar-brand" href="#">
+              <img src="https://upload.wikimedia.org/wikipedia/en/1/1d/CEG_main_logo.png"  width="250" height="200" class="d-inline-block align-top" alt="CEG-LOGO">
+      </a>
+    </div> 
+
+    <div class="col col-lg-10 col-md-12 col-sm-12">
+      <p class="textColor text-center">AUTOMATED DIAGNOSIS OF DIABETIC RETINOPATHY </p>
+    </div>
+    
+</div>
+
+
+</nav>
+
+
+<div class="container">
+	
+
+
+<div class="input-group mb-3 col col-lg-12">
+   <div class="custom-file">
+      <input type="file" class="custom-file-input" id="inputFile">
+      <label class="custom-file-label" for="inputFile">Choose file</label>
+  </div>
+</div>
+<p> Please upload only JPG or JPEG images </p>
+
+</div>
+
+<div class="container">
+  <div class="row">
+    <br>
+
+
+    <div class="col col-xl-6 col-lg-7 col-md-12 col-sm-12">
+      <img id="image_upload_preview" src="http://placehold.it/500X290" alt="your image" /> <br> <br>      
+    </div>
+
+    <div class="col col-xl-6 col-lg-5 col-md-12 col-sm-12">      
+    	<button type="button" class="btn btn-dark btn-block" id="predict-button">Predict</button>  <br> <br> <br>    
+                    
+        Predicted Grade: <input type="text" id="grade-prediction" class="form-control" disabled>  <br><br><br>         
+
+       <button type="button" class="btn btn-secondary  btn-block" onclick = "refreshPage()" id="predict-another-image">Predict another image</button>
+       <br>
+
+    </div>
+
+
+</div>
+</div>
+
+
+
+
+
+<script>
+	function refreshPage(){
+		location.reload();
+	}
+        /*$("#predict-another-image").click(function(){
+            //window.location.reload(); 
+            //window.parent.location = window.parent.location.href;
+            history.go(0);
+        }); */
+</script>
+
+<script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+
+<script>
+	let base64Image;
+	function readURL(input){
+		if(input.files && input.files[0]){
+			var reader = new FileReader();
+		    reader.onload = function(event){
+		    	var image = new Image();  
+                image.onload=function(){
+                     //document.getElementById("original-Img").src=image.src;
+                     var canvas=document.createElement("canvas");
+                     var context=canvas.getContext("2d");
+                     canvas.width=image.width/8.567;
+                     canvas.height=image.height/9.821;
+                     context.drawImage(image,
+                      0,
+                      0,
+                      image.width,
+                      image.height,
+                      0,
+                      0,
+                      canvas.width,
+                      canvas.height
+                      );      
+                      document.getElementById("image_upload_preview").src = canvas.toDataURL();
+                }
+               image.src=event.target.result;
+			   //$("#image_upload_preview").attr('src', event.target.result);
+			   base64Image = event.target.result.replace("/^data:image\/png;base64,/",'');
+			   //base64Image = event.target.result.replace("");
+		       console.log(base64Image); 
+		}
+		reader.readAsDataURL(input.files[0]);
+	    $("#grade-prediction").text("");		
+	}
+}
+
+	//upload button onchange handler
+	$("#inputFile").change(function(){
+		console.log("entered into image selector onChange handler");
+		readURL(this);			
+	});
+
+
+    //POST API call on onclick handler
+	$("#predict-button").click(function(){
+		let message = {
+			image: base64Image
+		}
+		console.log(message);        
+
+		$.post("/predict", JSON.stringify(message), function(response) {
+			console.log('GOT RESPONSE YARRRR');
+			$("#grade-prediction").val(response.predictions.grade);			
+		});
+
+	});
+
+
+</script>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+</body>
+</html>
+
+
+
+
+
