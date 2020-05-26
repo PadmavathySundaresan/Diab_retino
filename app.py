@@ -25,11 +25,6 @@ import scipy
 app = Flask(__name__)
 
 def prediction_from_Inception(image):
-    print('LOADING INCEPTION V3...')
-    classifier1 = pickle.load(open(r'C:\Users\Aishwarya\FLASK_INCEPTION_DUMMY\classifier_lr_idird_final.cpickle', 'rb')) #inception V3
-    base_model1 = InceptionV3(include_top=False, weights='imagenet', input_tensor=Input(shape=(299,299,3)))
-    model_test1 = Model(input=base_model1.input, output=base_model1.layers[-1].output)
-    print('INCEPTION V3 MODEL LOADED!!')
     image_size1 = (299, 299)    
     img = image.resize(image_size1)
     x = keras.preprocessing.image.img_to_array(img)
@@ -42,14 +37,9 @@ def prediction_from_Inception(image):
     print(preds)
     return preds
 
-    
+   
 
 def prediction_from_MobileNet(image):
-    print('LOADING MOBILENET...')
-    classifier2 = pickle.load(open(r'C:\Users\Aishwarya\FLASK_INCEPTION_DUMMY\classifier_mobilenet.cpickle', 'rb'))
-    base_model2 = MobileNet(include_top=False, weights='imagenet', input_tensor=Input(shape=(224,224,3)), input_shape=(224,224,3))
-    model_test2 = Model(input=base_model2.input, output=base_model2.layers[-1].output)
-    print('MOBILENET MODEL LOADED!!')
     image_size2 = (224, 224)      
     img = image.resize(image_size2)
     x = keras.preprocessing.image.img_to_array(img)
@@ -61,15 +51,10 @@ def prediction_from_MobileNet(image):
     preds = classifier2.predict(flat)
     print(preds)
     return preds
-    
-    
-    
-def prediction_from_Xception(image): 
-    print('LOADING XCEPTION...')
-    classifier3 = pickle.load(open(r'C:\Users\Aishwarya\FLASK_INCEPTION_DUMMY\classifier1 (1).cpickle', 'rb'))
-    base_model3 = Xception(weights='imagenet')
-    model_test3 = Model(input=base_model3.input, output=base_model3.get_layer('avg_pool').output)    
-    print('XCEPTION MODEL LOADED!!')
+   
+   
+   
+def prediction_from_Xception(image):
     image_size3 = (299, 299)        
     img = image.resize(image_size3)
     x = keras.preprocessing.image.img_to_array(img)
@@ -81,7 +66,7 @@ def prediction_from_Xception(image):
     preds = classifier3.predict(flat)
     print(preds)
     return preds
-    
+   
 
 def preprocess_image(image):
     if image.mode != "RGB":
@@ -93,6 +78,23 @@ print("HI. WELCOME TO THE SERVER")
 # graph = tf.get_default_graph()
 # global model
 # print("MODEL LOADED!!!")
+print('LOADING INCEPTION V3...')
+classifier1 = pickle.load(open(r'classifier_lr_idird_final.cpickle', 'rb')) #inception V3
+base_model1 = InceptionV3(include_top=False, weights='imagenet', input_tensor=Input(shape=(299,299,3)))
+model_test1 = Model(input=base_model1.input, output=base_model1.layers[-1].output)
+print('INCEPTION V3 MODEL LOADED!!')
+
+print('LOADING MOBILENET...')
+classifier2 = pickle.load(open(r'classifier_mobilenet.cpickle', 'rb'))
+base_model2 = MobileNet(include_top=False, weights='imagenet', input_tensor=Input(shape=(224,224,3)), input_shape=(224,224,3))
+model_test2 = Model(input=base_model2.input, output=base_model2.layers[-1].output)
+print('MOBILENET MODEL LOADED!!')
+
+print('LOADING XCEPTION...')
+classifier3 = pickle.load(open(r'classifier1 (1).cpickle', 'rb'))
+base_model3 = Xception(weights='imagenet')
+model_test3 = Model(input=base_model3.input, output=base_model3.get_layer('avg_pool').output)    
+print('XCEPTION MODEL LOADED!!')
 
 @app.route("/predict", methods=["POST"])
 def doPrediction():
@@ -104,25 +106,25 @@ def doPrediction():
     decoded = base64.b64decode(encoded)
     dataBytesIO = io.BytesIO(decoded)
     image = Image.open(dataBytesIO)
-    
+   
     processed_image = preprocess_image(image)  
     pred1 = prediction_from_Inception(processed_image)
     pred2 = prediction_from_MobileNet(processed_image)
     pred3 = prediction_from_Xception(processed_image)
-    
+   
     labels=[pred1, pred2, pred3]
     print(labels)    
-    
+   
     labels = np.array(labels)
     labels = np.transpose(labels)
     labels = scipy.stats.mode(labels,axis=None)[0]
     labels = np.squeeze(labels)
     print(labels.tolist())
    
-    
+   
     response = {
         'predictions': {
-            'grade' : labels.tolist()     
-        }   
-    } 
+            'grade' : labels.tolist()    
+        }  
+    }
     return jsonify(response)
