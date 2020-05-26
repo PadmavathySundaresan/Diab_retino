@@ -61,7 +61,7 @@ def prediction_from_MobileNet(image):
    
 def prediction_from_Xception(image):
     image_size3 = (299, 299)        
-   img = image.resize(image_size3)
+    img = image.resize(image_size3)
     x = keras.preprocessing.image.img_to_array(img)
     x = np.expand_dims(x, axis=0)    
     x = preprocess_input(x)
