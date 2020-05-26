@@ -59,18 +59,18 @@ def prediction_from_MobileNet(image):
    
    
    
-def prediction_from_Xception(image):
-    image_size3 = (299, 299)        
-    img = image.resize(image_size3)
-    x = keras.preprocessing.image.img_to_array(img)
-    x = np.expand_dims(x, axis=0)    
-    x = preprocess_input(x)
-    feature = model_test3.predict(x)
-    flat = feature.flatten()
-    flat = np.expand_dims(flat, axis=0)
-    preds = classifier3.predict(flat)
-    print(preds)
-    return preds
+#def prediction_from_Xception(image):
+#    image_size3 = (299, 299)        
+#   img = image.resize(image_size3)
+#    x = keras.preprocessing.image.img_to_array(img)
+#    x = np.expand_dims(x, axis=0)    
+#    x = preprocess_input(x)
+#    feature = model_test3.predict(x)
+#    flat = feature.flatten()
+#    flat = np.expand_dims(flat, axis=0)
+#    preds = classifier3.predict(flat)
+#    print(preds)
+#    return preds
    
 
 def preprocess_image(image):
@@ -95,11 +95,11 @@ base_model2 = MobileNet(include_top=False, weights='imagenet', input_tensor=Inpu
 model_test2 = Model(input=base_model2.input, output=base_model2.layers[-1].output)
 print('MOBILENET MODEL LOADED!!')
 
-print('LOADING XCEPTION...')
-classifier3 = pickle.load(open(r'classifier1 (1).cpickle', 'rb'))
-base_model3 = Xception(weights='imagenet')
-model_test3 = Model(input=base_model3.input, output=base_model3.get_layer('avg_pool').output)    
-print('XCEPTION MODEL LOADED!!')
+#print('LOADING XCEPTION...')
+#classifier3 = pickle.load(open(r'classifier1 (1).cpickle', 'rb'))
+#base_model3 = Xception(weights='imagenet')
+#model_test3 = Model(input=base_model3.input, output=base_model3.get_layer('avg_pool').output)    
+#print('XCEPTION MODEL LOADED!!')
 
 @app.route("/predict", methods=["POST"])
 def doPrediction():
@@ -115,9 +115,9 @@ def doPrediction():
     processed_image = preprocess_image(image)  
     pred1 = prediction_from_Inception(processed_image)
     pred2 = prediction_from_MobileNet(processed_image)
-    pred3 = prediction_from_Xception(processed_image)
+    #pred3 = prediction_from_Xception(processed_image)
    
-    labels=[pred1, pred2, pred3]
+    labels=[pred1, pred2]
     print(labels)    
    
     labels = np.array(labels)
