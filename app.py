@@ -21,8 +21,13 @@ from keras.layers import Input
 from sklearn.linear_model import LogisticRegression
 from keras.preprocessing.image import img_to_array
 import scipy
+import sys
+import logging
 
 app = Flask(__name__)
+
+app.logger.addHandler(logging.StreamHandler(sys.stdout))
+app.logger.setLevel(logging.ERROR)
 
 def prediction_from_Inception(image):
     image_size1 = (299, 299)    
