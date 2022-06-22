@@ -4,6 +4,6 @@ Keras==2.3.0
 pandas==1.0.3
 tensorflow==1.14.0
 scikit-learn==0.23.1
-numpy==1.18.4
+numpy==1.22.0
 scipy==1.4.1
 pillow==4
